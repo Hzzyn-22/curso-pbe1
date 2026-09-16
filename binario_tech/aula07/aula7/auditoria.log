@@ -1,0 +1,11 @@
+===== AUDITORIA COMPLETA - 2026-08-20 00:01:15 =====
+\n--- GET /api/v1/telemetria ---
+{"servico":"Telemetria Binario Tech","rotas":["/api/v1/telemetria/scania","/api/v1/telemetria/mercedes"]}
+HTTP_STATUS=200
+\n--- GET /api/v1/telemetria/scania ---
+{"montadora":"Scania","dados":[{"id":1,"modelo":"R540","vin":"9BS555444333","temperatura_motor":88,"status":"NORMAL"},{"id":2,"modelo":"S500","vin":"9BS987654321","temperatura_motor":102,"status":"ALERTA_AQUECIMENTO"}]}
+HTTP_STATUS=200
+\n--- GET /api/v1/telemetria/mercedes ---
+{"montadora":"Mercedes-Benz","dados":[{"id":1,"modelo":"Actros 2653","vin":"WDB000000001","tipo":"Actros","status":"ATIVO"},{"id":2,"modelo":"Atego 2426","vin":"WDB000000002","tipo":"Atego","status":"ATIVO"}]}
+HTTP_STATUS=200
+\n===== FIM DA AUDITORIA =====

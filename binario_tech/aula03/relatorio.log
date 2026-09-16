@@ -1,0 +1,21 @@
+=========================================================================
+                   AUDITORIA DE TELEMTRIA - BINARIO TECH                 
+  Data/Hora: Sat Aug  1 02:30:29 AM UTC 2026
+=========================================================================
+
+[1] Testando Rota Escania...
+{
+  "montadora": "Scania",
+  "modelo": "R450",
+  "status": "OK",
+  "conexao": true,
+  "velocidade_media": 82
+}
+
+[2] Testando Rota Mercedes Benz...
+
+[3] Testando Rota Volkswagen...
+
+[4] Testando rota Volvo...
+======================================================================
+auditoria finalizada com sucesso!

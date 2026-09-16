@@ -1,0 +1,12 @@
+Iniciando testes CRUD...
+{"id":4,"placa":"ABC-1234","montadora":"Scania","modelo":"R500","status":"DISPONIVEL"}{"id":5,"placa":"XYZ-5678","montadora":"Mercedes","modelo":"Actros","status":"DISPONIVEL"}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot PATCH /api/v1/veiculos/1</pre>
+</body>
+</html>
+{"mensagem":"Veiculo ID 2 removido com sucesso."}Testes concluídos.
