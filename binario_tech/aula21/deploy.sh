@@ -3,6 +3,11 @@ echo "=================================================="
 echo "    PIPELINE DE DEPLOY AUTOMATIZADO - BINÁRIO TECH"
 echo "=================================================="
 
+# EXERCÍCIO 2: Registra data, hora e commit hash no histórico
+COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "no-commit")
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+echo "[$TIMESTAMP] Deploy realizado - Commit: $COMMIT_HASH" >> deploy_history.log
+
 REPO_DIR="$HOME/curso-pbe1/binario_tech"
 APP_NAME="api-cicd"
 PORT=3002
