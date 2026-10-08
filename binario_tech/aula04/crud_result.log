@@ -1,12 +1,59 @@
-Iniciando testes CRUD...
-{"id":4,"placa":"ABC-1234","montadora":"Scania","modelo":"R500","status":"DISPONIVEL"}{"id":5,"placa":"XYZ-5678","montadora":"Mercedes","modelo":"Actros","status":"DISPONIVEL"}<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Error</title>
-</head>
-<body>
-<pre>Cannot PATCH /api/v1/veiculos/1</pre>
-</body>
-</html>
-{"mensagem":"Veiculo ID 2 removido com sucesso."}Testes concluídos.
+=== INICIANDO TESTE CRUD - Thu Oct  1 06:55:42 PM UTC 2026 ===
+
+[1/4] Cadastrando primeiro veiculo...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   167  100    87  100    80  30303  27864 --:--:-- --:--:-- --:--:-- 83500
+HTTP/1.1 201 Created
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 87
+ETag: W/"57-j9JdA9VpHUA9ZTcvuQ9Oe31xsns"
+Date: Thu, 01 Oct 2026 18:55:42 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":3,"placa":"KLL-9090","montadora":"Volvo","modelo":"FH 540","status":"DISPONIVEL"}
+[2/4] Cadastrando segundo veiculo...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   165  100    86  100    79  26203  24070 --:--:-- --:--:-- --:--:-- 55000
+HTTP/1.1 201 Created
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 86
+ETag: W/"56-Sw3pbypwuH6AYrGNhO3bii9RhUc"
+Date: Thu, 01 Oct 2026 18:55:42 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":4,"placa":"XYZ-8888","montadora":"Scania","modelo":"R450","status":"DISPONIVEL"}
+[3/4] Atualizando status do veiculo 1...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   165  100   145  100    20  38821   5354 --:--:-- --:--:-- --:--:-- 55000
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 145
+ETag: W/"91-1vjm3fgpgZdX7+Rn5uCNnBY6spE"
+Date: Thu, 01 Oct 2026 18:55:43 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"mensagem":"Status atualizado com sucesso!","veiculo":{"id":1,"placa":"ABC-1234","montadora":"Scania","modelo":"FH540","status":"INDISPONIVEL"}}
+[4/4] Deletando veiculo 2...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    49  100    49    0     0  19710      0 --:--:-- --:--:-- --:--:-- 24500
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 49
+ETag: W/"31-IHo0Pne/lcuLPk4qfq+tyZC4ZwE"
+Date: Thu, 01 Oct 2026 18:55:43 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"mensagem":"Veiculo ID 2 removido com sucesso."}
+=== TESTES CONCLUIDOS ===

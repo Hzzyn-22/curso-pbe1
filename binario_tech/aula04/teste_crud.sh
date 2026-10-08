@@ -1,25 +1,25 @@
 #!/bin/bash
 
-LOGFILE="crud_result.log"
+LOG_FILE="crud_result.log"
+echo "=== INICIANDO TESTE CRUD - $(date) ===" > $LOG_FILE
 
-echo "Iniciando testes CRUD..." > $LOGFILE
-
-# Cadastro de 2 veículos
-curl -X POST http://localhost:3000/api/v1/veiculos \
+echo -e "\n[1/4] Cadastrando primeiro veiculo..." >> $LOG_FILE
+curl -i -X POST http://localhost:3000/api/v1/veiculos \
   -H "Content-Type: application/json" \
-  -d '{"montadora":"Scania","modelo":"R500","placa":"ABC-1234"}' >> $LOGFILE
+  -d '{"montadora":"Volvo","modelo":"FH 540","placa":"KLL-9090","status":"DISPONIVEL"}' >> $LOG_FILE 2>&1
 
-curl -X POST http://localhost:3000/api/v1/veiculos \
+echo -e "\n[2/4] Cadastrando segundo veiculo..." >> $LOG_FILE
+curl -i -X POST http://localhost:3000/api/v1/veiculos \
   -H "Content-Type: application/json" \
-  -d '{"montadora":"Mercedes","modelo":"Actros","placa":"XYZ-5678"}' >> $LOGFILE
+  -d '{"montadora":"Scania","modelo":"R450","placa":"XYZ-8888","status":"DISPONIVEL"}' >> $LOG_FILE 2>&1
 
-# Atualiza 1 deles (ID 1 como exemplo)
-curl -X PATCH http://localhost:3000/api/v1/veiculos/1 \
+echo -e "\n[3/4] Atualizando status do veiculo 1..." >> $LOG_FILE
+curl -i -X PATCH http://localhost:3000/api/v1/veiculos/1/status \
   -H "Content-Type: application/json" \
-  -d '{"status":"EM_ROTA"}' >> $LOGFILE
+  -d '{"status":"EM_ROTA"}' >> $LOG_FILE 2>&1
 
-# Deleta o outro (ID 2 como exemplo)
-curl -X DELETE http://localhost:3000/api/v1/veiculos/2 >> $LOGFILE
+echo -e "\n[4/4] Deletando veiculo 2..." >> $LOG_FILE
+curl -i -X DELETE http://localhost:3000/api/v1/veiculos/2 >> $LOG_FILE 2>&1
 
-echo "Testes concluídos." >> $LOGFILE
-
+echo -e "\n=== TESTES CONCLUIDOS ===" >> $LOG_FILE
+echo "Testes executados com sucesso! Logs salvos em $LOG_FILE."
