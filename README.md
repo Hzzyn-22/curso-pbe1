@@ -1482,4 +1482,322 @@ Permission denied no script: execute chmod +x testar_telemetria.sh.
 
 •
 A rota Volvo retorna 404: confira se o bloco da rota foi salvo em telemetria.js, antes de app.listen(... ), e reinicie o servidor.
+-------------------------------------------------------------------------------------------------------------------------
 
+Aula 05 - PASSO A PASSO COMPLETO
+
+Guia de estudos cheat sheet completo para o desenvolvimento da API modularizada com Express, autenticação por API Key, validação de CNH e auditoria via Bash.
+
+1. Preparação do Ambiente.
+2. Estrutura de Pastas.
+3. Implementação dos Middlewares.
+4. Implementação das Rotas (Express Router).
+5. Aplicação Principal (`app.js`).
+6. Testes Manuais via cURL (Com Tratamento de Erros).
+7. Script de Auditoria Bash (`teste_seguranca.sh`).
+8. Gerenciamento de Processos no Linux.
+
+------------------------------------------------------------
+
+1. Preparação do Ambiente
+
+No terminal do servidor Debian, execute os comandos para criar a estrutura e instalar as dependências:
+
+bash
+cd ~/binario_tech
+mkdir -p prova_aula05/routes prova_aula05/middlewares
+cd prova_aula05
+npm init -y
+npm install express cors
+
+------------------------------------------------------------------------------------------------------------
+
+2. Estrutura das pastas 
+
+prova_aula05/
+├── package.json
+├── app.js 
+├── routes/ 
+│   ├── motoristas.js
+│   └── manutencoes.js
+├── middlewares/
+│   ├── logger.js
+│   ├── auth.js
+│   └── validaCnh.js
+└── teste_seguranca.sh
+
+Crie primeiro a pasta prova_aula05 depois o routes, 
+e dentro de routes adcione motoristas.js e manutençoes.js,
+no middlewares coloque logger.js, auth.js, validaCnh.js
+e por ultimo a app.js.
+
+---------------------------------------------------------------
+
+3. Implementação dos Middlewares
+
+middlewares/logger.js:
+
+function loggerMiddleware(req, res, next) {
+    const inicio = Date.now();
+    const timestamp = new Date().toISOString();
+    
+    res.on('finish', () => {
+        const duracao = Date.now() - inicio;
+        console.log(`[LOG ${timestamp}] ${req.method} ${req.originalUrl} - Status: ${res.statusCode} (${duracao}ms)`);
+    });
+    
+    next();
+}
+
+module.exports = loggerMiddleware;
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+middlewares/auth.js:
+
+function authMiddleware(req, res, next) {
+    const apiKey = req.headers['x-api-key'];
+    const CHAVE_VALIDA = "binario-tech-secret-2026";
+
+    if (!apiKey || apiKey !== CHAVE_VALIDA) {
+        return res.status(401).json({
+            erro: "Acesso nao autorizado. Header 'X-API-KEY' invalido ou ausente."
+        });
+    }
+
+    next();
+}
+
+module.exports = authMiddleware;
+
+-----------------------------------------------------------------------------------------------
+
+middlewares/validaCnh.js:
+
+function validaCnh(req, res, next) {
+    const { cnh } = req.body;
+    const regexCnh = /^\d{11}$/;
+
+    if (!cnh || !regexCnh.test(cnh)) {
+        return res.status(400).json({
+            erro: "Validacao falhou: A CNH deve conter exatamente 11 digitos numericos."
+        });
+    }
+
+    next();
+}
+
+module.exports = validaCnh;
+
+-------------------------------------------------------------------------------------------------------------
+
+4. Implementação das Rotas (Express Router)
+
+motoristas.js:
+
+const express = require('express');
+const router = express.Router();
+const validaCnh = require('../middlewares/validaCnh');
+
+let motoristas = [
+    { id: 1, nome: "Carlos Silva", cnh: "12345678900", categoria: "E", ativo: true },
+    { id: 2, nome: "Ana Pereira", cnh: "98765432100", categoria: "D", ativo: true }
+];
+
+// GET /api/v1/motoristas
+router.get('/', (req, res) => {
+    res.status(200).json(motoristas);
+});
+
+// POST /api/v1/motoristas (Aplicando validacao de CNH exclusiva nesta rota)
+router.post('/', validaCnh, (req, res) => {
+    const { nome, cnh, categoria } = req.body;
+
+    if (!nome || !categoria) {
+        return res.status(400).json({ erro: "Campos 'nome' e 'categoria' sao obrigatorios." });
+    }
+
+    const novoMotorista = {
+        id: motoristas.length + 1,
+        nome,
+        cnh,
+        categoria,
+        ativo: true
+    };
+
+    motoristas.push(novoMotorista);
+    res.status(201).json(novoMotorista);
+});
+
+module.exports = router;
+
+--------------------------------------------------------------------------------------------------------------
+
+routes/manutencoes.js
+
+const express = require('express');
+const router = express.Router();
+
+let manutencoes = [
+    { id: 1, veiculoId: 1, descricao: "Troca de oleo", custo: 1200.00, status: "CONCLUIDO" }
+];
+
+// GET /api/v1/manutencoes
+router.get('/', (req, res) => {
+    res.status(200).json(manutencoes);
+});
+
+// POST /api/v1/manutencoes
+router.post('/', (req, res) => {
+    const { veiculoId, descricao, custo, status } = req.body;
+
+    if (!veiculoId || !descricao || !custo || !status) {
+        return res.status(400).json({ erro: "Todos os campos sao obrigatorios." });
+    }
+
+    const novaManutencao = {
+        id: manutencoes.length + 1,
+        veiculoId,
+        descricao,
+        custo,
+        status: status.toUpperCase()
+    };
+
+    manutencoes.push(novaManutencao);
+    res.status(201).json(novaManutencao);
+});
+
+module.exports = router;
+
+----------------------------------------------------------------------------------------------------
+
+5. Aplicação Principal
+
+app.js:
+
+const express = require('express');
+const cors = require('cors');
+const loggerMiddleware = require('./middlewares/logger');
+const authMiddleware = require('./middlewares/auth');
+const motoristasRouter = require('./routes/motoristas');
+const manutencoesRouter = require('./routes/manutencoes');
+
+const app = express();
+const PORT = 3000;
+
+
+app.use(cors());
+app.use(express.json());
+app.use(loggerMiddleware);
+
+
+app.get('/api/v1/health', (req, res) => {
+    res.status(200).json({ status: "ONLINE", aplicacao: "Binario Tech API v2" });
+});
+
+
+app.use('/api/v1/motoristas', authMiddleware, motoristasRouter);
+app.use('/api/v1/manutencoes', authMiddleware, manutencoesRouter);
+
+
+app.use((req, res) => {
+    res.status(404).json({ erro: "Endpoint nao encontrado no servidor Binario Tech." });
+});
+
+app.listen(PORT, () => {
+    console.log(`[Binario Tech] Servidor ativo na porta ${PORT}`);
+});
+
+---------------------------------------------------------------------------------------------------
+
+6. Testes Manuais via cURL (Com Tratamento de Erros)
+
+Iniciar o Servidor
+
+node app.js &
+
+-------------------------------------------------------------
+
+Testar Health Check (Pública):
+curl -s http://localhost:3000/api/v1/health | jq .
+
+--------------------------------------------------------------
+
+Testar Acesso Negado (Sem API Key -> Esperado 401):
+curl -i http://localhost:3000/api/v1/motoristas
+
+---------------------------------------------------------------------------------------------------
+
+Testar Acesso Autorizado (Com API Key válida -> Esperado 200):
+curl -s -H "X-API-KEY: binario-tech-secret-2026" http://localhost:3000/api/v1/motoristas | jq .
+
+-----------------------------------------------------------------------
+
+Testar Validação de CNH Inválida (< 11 dígitos -> Esperado 400):
+curl -i -X POST http://localhost:3000/api/v1/motoristas \
+  -H "X-API-KEY: binario-tech-secret-2026" \
+  -H "Content-Type: application/json" \
+  -d '{"nome":"Teste Fail","cnh":"123","categoria":"A"}'
+
+--------------------------------------------------------------
+
+Testar Erro 404 (Rota inexistente):
+curl -i http://localhost:3000/api/v1/rota-que-nao-existe
+
+-------------------------------------------------------------------------------------------------------------
+
+7. Script de Auditoria Bash
+
+teste_seguranca.sh:
+
+#!/bin/bash
+
+# Cria ou limpa o arquivo de log no início da execução
+LOG_FILE="resultado.log"
+echo "=== INÍCIO DOS TESTES DE SEGURANÇA ===" > "$LOG_FILE"
+
+echo "1. Testando Health Check..." | tee -a "$LOG_FILE"
+curl -s -i http://localhost:3000/api/v1/health | tee -a "$LOG_FILE"
+echo -e "\n----------------------------------------\n" >> "$LOG_FILE"
+
+echo "2. Testando Acesso Negado (Sem API Key)..." | tee -a "$LOG_FILE"
+curl -s -i http://localhost:3000/api/v1/motoristas | tee -a "$LOG_FILE"
+echo -e "\n----------------------------------------\n" >> "$LOG_FILE"
+
+echo "3. Testando Sucesso com API Key..." | tee -a "$LOG_FILE"
+curl -s -i -H "X-API-KEY: binario-tech-secret-2026" http://localhost:3000/api/v1/motoristas | tee -a "$LOG_FILE"
+echo -e "\n----------------------------------------\n" >> "$LOG_FILE"
+
+echo "4. Testando Validação de CNH Inválida (400 Bad Request)..." | tee -a "$LOG_FILE"
+curl -s -i -X POST http://localhost:3000/api/v1/motoristas \
+  -H "X-API-KEY: binario-tech-secret-2026" \
+  -H "Content-Type: application/json" \
+  -d '{"nome":"Teste Fail","cnh":"123","categoria":"A"}' | tee -a "$LOG_FILE"
+echo -e "\n----------------------------------------\n" >> "$LOG_FILE"
+
+echo "5. Testando Rota Inexistente (404 Not Found)..." | tee -a "$LOG_FILE"
+curl -s -i http://localhost:3000/api/v1/rota-que-nao-existe | tee -a "$LOG_FILE"
+echo -e "\n=== FIM DOS TESTES ===" >> "$LOG_FILE"
+
+echo -e "\nTestes finalizados! Todos os resultados foram salvos em '$LOG_FILE'."
+
+Comandos para rodar o script:
+
+chmod +x teste_seguranca.sh
+./teste_seguranca.sh
+cat audit_seguranca.log
+
+------------------------------------------------------------------------------------------------------------------
+
+8. Gerenciamento de Processos no Linux:
+
+ps aux | grep node
+kill -9 <PID>
+
+O PID fica Após o usuario.
+
+-----------------------------------------------------
+
+ERROS: 
+
+Nao colocar o nome do arquivo de validarCnh.js com r no final
